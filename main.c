@@ -1,5 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/stat.h>
 #include <dirent.h>
 
 void save_current_id(const char *username, const char *email) {
@@ -115,23 +118,84 @@ int config_handle(int argc, char const *argv[]) {
             return 1;
         }
     }
-    else {
-        printf("Invalid command. Please use 'config', 'user.name', or'user.email'.\n");
+    else {printf("Invalid command. Please use 'config', 'user.name', or 'user.email'.\n");
         return 1;
     }
 }
 
+int init_handle(int argc, char const *argv[]) {
+    if (argc >= 3) {
+        printf("Error: Too many arguments.\n");
+        return 1;
+    }
+    char cwd[1024];
+    if (getcwd(cwd, sizeof(cwd)) == NULL) {
+        perror("Error getting current directory");
+        return 1;
+    }
+    struct stat st;
+    if (stat(".neogit", &st) == 0 && S_ISDIR(st.st_mode)) {
+        printf("Error: A .neogit folder already exists.\n");
+        return 1;
+    }
+    if (mkdir(".neogit",0777) == -1) {
+        perror("Error creating .neogit directory");
+        return 1;
+    }
+    printf("Successfully created .neogit directory.\n");
+
+    return 0;
+}
+
+
+int add_handle(int argc, char *const argv[]) {
+    if (argc < 3) {
+        perror("Error : please specify a file");
+        return 1;
+    }
+	else{
+		//code
+		return 0;
+	}
+}
+
+int reset_handle(int argc, char *const argv[]) { 
+    if (argc < 3) {
+        perror("Error : please specify a file");
+        return 1;
+    }
+	else{
+		//code
+		return 0;
+	}
+}
+
+int commit_handle(int argc, char *const argv[]) { 
+    if (argc < 3) {
+        perror("Error : please use the correct format");
+        return 1;
+    }
+	else{
+		//code
+		return 0;
+	}
+}
+
 int main(int argc, char const *argv[]) {
     printf("Hello!\n");
-    printf("The Number of arguments is: %d\n", argc);
-
-    for (int i = 0; i < argc; i++) {
-        printf("The Argument[%d] is: \"%s\"\n", i, argv[i]);
-    }
-
-    printf("\n\n");
-
     if (argc >= 2 && strcmp(argv[1], "config") == 0) {
         return config_handle(argc, argv);
     } 
+	else if (argc >= 2 && strcmp(argv[1], "init") == 0) {
+		return init_handle(argc, argv);
+	}
+	else if (argc >= 2 && strcmp(argv[1], "add") == 0) {
+		return add_handle(argc, argv);
+	}
+	else if (argc >= 2 && strcmp(argv[1], "commit") == 0) {
+		return commit_handle(argc, argv);
+	}
+	else if (argc >= 2 && strcmp(argv[1], "reset") == 0) {
+		return reset_handle(argc, argv);
+	}
 }
